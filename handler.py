@@ -12,10 +12,6 @@ class Request(object):
         self.param = param_temp[param_temp.rindex("/")+1:-1] if self.get_args else url_path[url_path.rindex("/"):-1]
         self.path = url_path
 
-
-
-
-
     def __call__(self, f):
         def wrapper(obj, *args, **kwargs):
             payload = f(obj, *args, **kwargs)
