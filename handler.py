@@ -60,28 +60,4 @@ class DeleteRequest(Request):
         else:
             super().__init__("DELETE", path, h)
 
-myToken = 'Secret_key_1234567890'
 
-class DecoRequests(object):
-    def __init__(self, host):
-        self.host = host
-
-    @GetRequest(path="userlist", h={'access_token':myToken})
-    def list_employees(self):
-        pass
-
-    @GetRequest(path="users", h={'access_token':myToken})
-    def list_employee(self, username):
-        return {"username":username}
-
-    @PostRequest(path="users", h={'access_token':myToken})
-    def add_employee(self, employee_data):
-        return employee_data
-
-    @PutRequest(path="users", h={'access_token':myToken})
-    def update_employee(self, employee_data):
-        return employee_data
-
-    @DeleteRequest(path="users", h={'access_token':myToken})
-    def rm_employee(self, username):
-        return {"username":username}
