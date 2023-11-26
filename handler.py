@@ -25,11 +25,10 @@ class Request(object):
                 data[arg.split("=")[0]] = arg.split("=")[1]
             args = {
                 'method': self.method,
-                'url': 'http://{}/{}'.format(obj.host, self.path),
-                'headers': self.h
+                'url': 'http://{}/{}'.format(obj.host, self.path)
             }
             if payload is not None:
-                args['data'] = payload
+                args['data'] = data
             return requests.request(**args)
         return wrapper
 
