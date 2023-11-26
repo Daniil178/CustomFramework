@@ -4,6 +4,7 @@ import argparse
 import socket
 import threading
 from queue import Queue
+from handler_register import handler_register
 
 def stop_server(*argc, **argv):
     """Catch SIGINT signal from keyboard and exit from programm
@@ -11,7 +12,7 @@ def stop_server(*argc, **argv):
     print("\nServer stoping...")
     sys.exit(0)
 
-def worker(que):
+def worker(que, g_dict):
     while True:
         conn = que.get()
         if conn is None:
@@ -19,10 +20,9 @@ def worker(que):
         else:
             with conn:
                 data = conn.recv(1024)
-                answer = data.decode()  # Change to path function
-                print(f"{answer}")
+                response = path(data.decode('utf-8'), g_dict)  # Change to path function
                 try:
-                    conn.sendall(answer.encode())
+                    conn.sendall(response.encode())
                 except socket.error:
                     print(f"Error: cannot send data to {conn}")
                 else:
@@ -38,6 +38,10 @@ class ServerThreadMain(threading.Thread):
         self.workers = workers_num
 
     def run(self):
+        try:
+            g_dict = handler_register()
+        except ModuleNotFoundError as err:
+            raise RuntimeError from err
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind((self.host, self.port))
@@ -46,7 +50,7 @@ class ServerThreadMain(threading.Thread):
                 threading.Thread(
                     target=worker,
                     name=f"worker-{i}",
-                    args=(self.conn_que,),
+                    args=(self.conn_que, g_dict),
                     daemon=True,
                 )
                 for i in range(self.workers)
