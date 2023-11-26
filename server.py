@@ -5,6 +5,7 @@ import socket
 import threading
 from queue import Queue
 from handler_register import handler_register
+from path import path
 
 def stop_server(*argc, **argv):
     """Catch SIGINT signal from keyboard and exit from programm

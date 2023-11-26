@@ -1,2 +1,6 @@
+from handler import Request
+import json
+
+@Request(method="get", url_path="/hello")
 def hello():
-    print("Hello world")
+    return json.loads({"msg", "hello world"})

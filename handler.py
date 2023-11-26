@@ -1,31 +1,28 @@
-import ujson
-import requests
 import re
-#"/search/cwe-257/?type=json&abc=zxc"
-#CWE-257
-#detail=False, methods=['get', url_path=r'search/(?P<cwe_start>[a-zA-Z0-9\-+')  "[a-z]{3}-[0-9]{3}"
+
 class Request(object):
-    def __init__(self, method, url_path ):
+    def __init__(self, method, url_path):
         self.method = method.upper()
-        self.get_args = (url_path[url_path.index("?"): -1])[1:-1] if url_path.index("?") != -1 else None
-        param_temp = url_path[0:url_path.index("?") - 1]
-        self.param = param_temp[param_temp.rindex("/")+1:-1] if self.get_args else url_path[url_path.rindex("/"):-1]
+        self.get_args = url_path.index("?")(url_path[url_path.index("?"): -1])[1:-1] if url_path.find("?") != -1 else None
+        param_temp = url_path[0:url_path.index("?") - 2] if url_path.find("?") != -1 else url_path[:]
+        param_index = param_temp.rfind('(#')
+        if param_index != -1:
+            self.param = param_temp[param_index + 2:]
+            self.path = param_temp[:-2]
+        else:
+            self.param = None
         self.path = url_path
+        print(f"DECO INIT {self.path, method, url_path}")
 
     def __call__(self, f):
-        def wrapper(obj, *args, **kwargs):
-            payload = f(obj, *args, **kwargs)
-            print(f"PAYLOAD {payload}")
+        def wrapper(request, response,  *args, **kwargs):
             data = {}
             for arg in self.get_args.split("&"):
                 data[arg.split("=")[0]] = arg.split("=")[1]
-            args = {
-                'method': self.method,
-                'url': 'http://{}/{}'.format(obj.host, self.path)
-            }
-            if payload is not None:
-                args['data'] = data
-            return requests.request(**args)
+            response_data = f(request, *args, **kwargs)
+            if response_data is not None:
+                response.data = response_data
+            return response
         return wrapper
 
 class GetRequest(Request):

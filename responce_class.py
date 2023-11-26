@@ -7,7 +7,7 @@ from status import HTTP_STATUS
 
 
 @dataclass
-class response:
+class Response:
     data: dict[Any]
     status: HTTP_STATUS
     headers: dict[Any]
